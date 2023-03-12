@@ -1,3 +1,4 @@
+import os
 import cv2
 import math
 import numpy as np
@@ -85,10 +86,9 @@ class FaceRecognition:
         self.dist_feed_dict[self.tf_tar] = embeddings_tar[0]
         distance = self.dist_sess.run(self.tf_dist_embedding, feed_dict=self.dist_feed_dict)
         arg = np.argmin(distance)
-        name = "__Unknown__"
+        name = "Unknown"
         if distance[arg] < THRESHOLD:
             name = self.ref_paths[arg].split("\\")[-1].split(".")[0]
-            name += "_" + str(round(distance[arg], 2))
         return name
 
     def recognize(self, img_raw, bbox):
