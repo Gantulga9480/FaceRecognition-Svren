@@ -1,0 +1,74 @@
+.Login {
+    position: relative;
+    background-color: white;
+}
+
+.Login-header {
+    font-size: 3em;
+    font-weight: 600;
+    width: 400px;
+    position: absolute;
+    left: 50%;
+    margin-left: -200px;
+    top: 50%;
+    margin-top: -300px;
+}
+
+.Login form {
+    position: absolute;
+    left: 50%;
+    margin-left: -200px;
+    top: 50%;
+    margin-top: -100px;
+}
+
+.Login form div {
+    position: relative;
+}
+
+.Login form div input {
+    position: absolute;
+    width: 400px;
+    height: 50px;
+    font-size: 1.5em;
+    border-top-style: hidden;
+    border-right-style: hidden;
+    border-left-style: hidden;
+    border-bottom-style: solid;
+    transition: var(--global-transition);
+}
+
+.Login form input[type="text"] {
+    top: 0px;
+}
+
+.Login form input[type="password"] {
+    top: 80px;
+}
+
+.Login form input[type="submit"] {
+    background-color:rgb(242, 145, 0);
+    font-size: 2.3em;
+    font-weight: 600;
+    top: 200px;
+    height: 70px;
+}
+
+.form-field:focus {
+    background-color: rgb(230, 230, 230);
+    padding: 10px;
+}
+
+.Login form input[type="submit"]:hover {
+    background-color: rgb(255, 176, 57);
+}
+
+.Login form input[type="submit"]:active {
+    scale: 0.95;
+    transition: 0.01s;
+}
+
+.Login-form-wrong {
+    background-color: rgb(255, 119, 119);
+    color: black;
+}

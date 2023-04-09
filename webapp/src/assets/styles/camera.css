@@ -1,0 +1,29 @@
+.web-camera {
+    display: inline-block;
+    position: relative;
+    text-align: center;
+    border-radius: 15px;
+}
+
+.webcam-overlay {
+    position: absolute;
+    border: 2px solid red;
+    z-index: 1;
+}
+
+.web-camera > video {
+    border-radius: 15px 15px 15px 15px;
+    box-sizing: border-box;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.web-camera > p {
+    position: absolute;
+    background-color: white;
+    margin: 0;
+    font-size: 20px;
+    font-weight: bold;
+    box-sizing: border-box;
+    border-radius: 5px 5px 5px 5px;
+    padding: 0px 8px 0px 8px;
+}
