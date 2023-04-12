@@ -28,8 +28,9 @@
 
 .Login form div input {
     position: absolute;
+    padding: 10px;
     width: 400px;
-    height: 50px;
+    height: 30px;
     font-size: 1.5em;
     border-top-style: hidden;
     border-right-style: hidden;
@@ -56,10 +57,14 @@
 
 .form-field:focus {
     background-color: rgb(230, 230, 230);
-    padding: 10px;
+    padding: 15px;
 }
 
 .Login form input[type="submit"]:hover {
+    background-color: rgb(255, 176, 57);
+}
+
+.Login form input[type="submit"]:focus {
     background-color: rgb(255, 176, 57);
 }
 
@@ -68,7 +73,15 @@
     transition: 0.01s;
 }
 
-.Login-form-wrong {
+.form-wrong {
     background-color: rgb(255, 119, 119);
-    color: black;
+}
+
+.login-error {
+    position: absolute;
+    left: 50%;
+    margin-left: -200px;
+    top: 55%;
+    color: red;
+    font-size: 1.2em;
 }

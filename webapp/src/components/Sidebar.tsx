@@ -8,9 +8,9 @@ import videoIcon from '../assets/icons/media-library.svg'
 import aboutIcon from '../assets/icons/community.svg'
 import '../assets/styles/sidebar.css'
 
-const navName = ['Үндсэн', 'Видео', 'Админ', 'Тухай']
-const navIcon = [homeIcon, videoIcon, adminIcon, aboutIcon]
+const navName = ['Home', 'Video', 'Adminstration', 'About us']
 const navPath = ['/', '/video', '/admin', '/about']
+const navIcon = [homeIcon, videoIcon, adminIcon, aboutIcon]
 
 let new_selected: boolean[] = getMask(navPath, location.pathname)
 

@@ -1,0 +1,7 @@
+.Loading {
+    display: flex;
+    justify-content: center;
+    background-color: white;
+    width: 30px;
+    box-sizing: border-box;
+}

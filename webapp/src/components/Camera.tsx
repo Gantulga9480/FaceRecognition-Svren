@@ -1,19 +1,27 @@
+import '../assets/styles/camera.css';
 import { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { NavigateOptions, useNavigate } from 'react-router-dom';
 import Webcam from 'react-webcam';
 import { AutoPOST } from '../utils/requests';
-import '../assets/styles/camera.css';
 import { FACE_RECOGNITION_URL } from '../api_endpoints';
 import { IDetectResponseData, IError } from '../api_endpoints.interface';
+import Loading from './Loading';
 
 export default function Camera() {
 
     const navigate = useNavigate();
+    const viewNavigate = (path: string, options?: NavigateOptions) => {
+// @ts-ignore
+        if (!document.startViewTransition) return navigate(path, options)
+// @ts-ignore
+        else return document.startViewTransition(() => navigate(path, options))
+    };
 
     const [names, setNames] = useState<string[]|null>([]);
     const [styles, setStyles] = useState<any[]>([]);
     const [count, setCount] = useState(0);
     const [timer, setTimer] = useState(0);
+    const [loading, setLoading] = useState(true)
     const webcamRef: any = useRef(null);
 
     function predict() {
@@ -35,12 +43,13 @@ export default function Camera() {
                         }
                         setNames(nms);
                         setStyles(stls);
+                        if (loading) setLoading(false)
                     } else {
                         setNames(null);
                     }
                     setTimer(0)
                 }, (error) => {
-                    navigate('/error', {state: error, replace: true})
+                    viewNavigate('/error', {state: error, replace: true})
                 })
             } else {
                 setCount(count + 1)
@@ -54,7 +63,7 @@ export default function Camera() {
                 reason: 'CAMERA_NOT_FOUND',
                 message: "Camera Not Found",
             }
-            navigate('/error', {state: state, replace: true})
+            viewNavigate('/error', {state: state, replace: true})
         }
     }, [count])
 
@@ -64,14 +73,17 @@ export default function Camera() {
     }, [])
 
     return (
-        <div className="web-camera">
-            <Webcam screenshotFormat='image/jpeg' ref={webcamRef} videoConstraints={{width: 640, height: 480, facingMode: "user"}} />
-            {names && Array.from(styles, (style: object, i) => {
-                return <div key={i} className='webcam-overlay' style={style}></div>
-            })}
-            {names && Array.from(names, (name: string, i) => {
-                return <p key={i} style={{top: styles[i].top+styles[i].height+2, left: styles[i].left}}>{name}</p>
-            })}
+        <div>
+            {loading && <Loading />}
+            <div className="web-camera">
+                <Webcam screenshotFormat='image/jpeg' ref={webcamRef} videoConstraints={{width: 640, height: 480, facingMode: "user"}} />
+                {names && Array.from(styles, (style: object, i) => {
+                    return <div key={i} className='webcam-overlay' style={style}></div>
+                })}
+                {names && Array.from(names, (name: string, i) => {
+                    return <p key={i} style={{top: styles[i].top+styles[i].height+2, left: styles[i].left}}>{name}</p>
+                })}
+            </div>
         </div>
     )
 }

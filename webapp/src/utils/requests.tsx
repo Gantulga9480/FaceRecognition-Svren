@@ -1,6 +1,6 @@
 import { IResponse, IError } from "../api_endpoints.interface";
 
-export async function POST(url: string, data: any) {
+export async function POST(url: string, data: object) {
     try {
         const response = await fetch(url, {
             method: 'POST',
@@ -16,7 +16,7 @@ export async function POST(url: string, data: any) {
     }
 }
 
-export function AutoPOST(url: string, data: any, onSuccess: (data: any) => void, onError: (error: IError) => void) {
+export function AutoPOST(url: string, data: object, onSuccess: (data: any) => void, onError: (error: IError) => void) {
     POST(url, data).then((res: IResponse) => {
         if (res.code === 200) onSuccess(res.data)
         else onError({reason: res.code.toString(), message: res.status})

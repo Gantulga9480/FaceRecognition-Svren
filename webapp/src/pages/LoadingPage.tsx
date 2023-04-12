@@ -1,5 +1,5 @@
 import anim from '../assets/animations/tail-spin.svg'
-import '../assets/styles/Loading.css'
+import '../assets/styles/LoadingPage.css'
 
 export default function Loading() {
     return (
