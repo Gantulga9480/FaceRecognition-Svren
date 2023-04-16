@@ -15,13 +15,6 @@
   --global-transition: 0.3s;
 }
 
-/* ::view-transition-old(root) {
-  animation: slide-out 0.5s ease-in-out 1 forwards;
-}
-::view-transition-new(root) {
-  animation: slide-in 0.5s ease-in-out 1 forwards;
-} */
-
 body {
   margin: 0;
 }

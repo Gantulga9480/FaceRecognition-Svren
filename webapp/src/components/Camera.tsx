@@ -1,21 +1,17 @@
 import '../assets/styles/camera.css';
 import { useState, useRef, useEffect } from 'react';
-import { NavigateOptions, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Webcam from 'react-webcam';
 import { AutoPOST } from '../utils/requests';
+import { useNavTransition } from '../utils/hooks';
 import { FACE_RECOGNITION_URL } from '../api_endpoints';
 import { IDetectResponseData, IError } from '../api_endpoints.interface';
 import Loading from './Loading';
 
 export default function Camera() {
 
-    const navigate = useNavigate();
-    const viewNavigate = (path: string, options?: NavigateOptions) => {
-// @ts-ignore
-        if (!document.startViewTransition) return navigate(path, options)
-// @ts-ignore
-        else return document.startViewTransition(() => navigate(path, options))
-    };
+    const navigate = useNavigate()
+    const transition = useNavTransition(navigate)
 
     const [names, setNames] = useState<string[]|null>([]);
     const [styles, setStyles] = useState<any[]>([]);
@@ -49,7 +45,7 @@ export default function Camera() {
                     }
                     setTimer(0)
                 }, (error) => {
-                    viewNavigate('/error', {state: error, replace: true})
+                    transition('/error', {state: error, replace: true})
                 })
             } else {
                 setCount(count + 1)
@@ -60,10 +56,10 @@ export default function Camera() {
     useEffect(() => {
         if (count === 2) {
             let state: IError = {
-                reason: 'CAMERA_NOT_FOUND',
-                message: "Camera Not Found",
+                code: 'CAMERA_NOT_FOUND',
+                status: "Camera Not Found",
             }
-            viewNavigate('/error', {state: state, replace: true})
+            transition('/error', {state: state, replace: true})
         }
     }, [count])
 
@@ -73,7 +69,7 @@ export default function Camera() {
     }, [])
 
     return (
-        <div>
+        <>
             {loading && <Loading />}
             <div className="web-camera">
                 <Webcam screenshotFormat='image/jpeg' ref={webcamRef} videoConstraints={{width: 640, height: 480, facingMode: "user"}} />
@@ -84,6 +80,6 @@ export default function Camera() {
                     return <p key={i} style={{top: styles[i].top+styles[i].height+2, left: styles[i].left}}>{name}</p>
                 })}
             </div>
-        </div>
+        </>
     )
 }

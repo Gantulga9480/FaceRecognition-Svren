@@ -6,6 +6,8 @@ interface IButton {
     text?: string
     icon?: any,
     seleced?: boolean,
+    textAlign?: string,
+    resizable?: boolean
 }
 
 export default function Button(props: IButton) {
@@ -17,6 +19,9 @@ export default function Button(props: IButton) {
 
     let classname = 'button prevent-select';
     classname += props.seleced ? ' button-selected' : '';
+    let textAlign: any = props.textAlign ? props.textAlign : 'center'
+    let margin = (props.icon && props.text) ? "10px" : "0px"
+    let textClass = props.resizable ? 'button-text hidden-half' : 'button-text'
 
     return (
         <div className={classname} onClick={ButtonCallback}>
@@ -26,7 +31,7 @@ export default function Button(props: IButton) {
                 </div>
             }
             {props.text &&
-                <div className='button-text hidden-half'>
+                <div className={textClass} style={{textAlign: textAlign, marginLeft: margin}}>
                     {props.text}
                 </div>
             }

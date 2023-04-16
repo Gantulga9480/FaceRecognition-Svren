@@ -22,6 +22,10 @@
     transition: 0.3s;
 }
 
+.side-bar > span {
+    margin-bottom: 10px;
+}
+
 @media (max-width: 960px) {
     .side-bar-container {
         width: var(--sidebar-min);

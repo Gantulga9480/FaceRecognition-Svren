@@ -37,15 +37,48 @@ class FaceRecognition:
             self.embedding_feed_dict[self.tf_dict['keep_prob']] = 1.0
         if 'phase_train' in self.tf_dict.keys():
             self.embedding_feed_dict[self.tf_dict['phase_train']] = False
+        self.ref_dir = ref_dir
         self.ref_paths = []
-        for dirname, _, filenames in os.walk(ref_dir):
+        self.dist_feed_dict = None
+        self.load_dist()
+
+    def inference(self, img_fr):
+        if self.dist_feed_dict:
+            self.embedding_feed_dict[self.tf_input] = img_fr
+            embeddings_tar = self.embedding_sess.run(self.tf_embeddings, feed_dict=self.embedding_feed_dict)
+            self.dist_feed_dict[self.tf_tar] = embeddings_tar[0]
+            distance = self.dist_sess.run(self.tf_dist_embedding, feed_dict=self.dist_feed_dict)
+            arg = np.argmin(distance)
+            name = "Unknown"
+            if distance[arg] < THRESHOLD:
+                name = self.ref_paths[arg].split("\\")[-1].split(".")[1]
+            return name
+        else:
+            return "Unknown"
+
+    def recognize(self, img_raw, bbox):
+        img_fr = self.preprocess(img_raw, bbox)
+        return self.inference(img_fr)
+
+    def preprocess(self, img, bbox):
+        img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        img_rgb = img_rgb.astype(np.float32)
+        img_rgb /= 255
+        img_fr = img_rgb[bbox[1]:bbox[1] + bbox[3], bbox[0]:bbox[0] + bbox[2], :]  # crop
+        img_fr = cv2.resize(img_fr, (self.model_shape[2], self.model_shape[1]))    # resize
+        img_fr = np.expand_dims(img_fr, axis=0)  # make 4 dimensions
+        return img_fr
+
+    def load_dist(self):
+        self.ref_paths = []
+        for dirname, _, filenames in os.walk(self.ref_dir):
             if len(filenames) > 0:
                 for filename in filenames:
                     if filename.split(".")[-1] in IMG_FORMAR:
                         self.ref_paths.append(os.path.join(dirname, filename))
         if len(self.ref_paths) == 0:
             print("No reference image for face recognition")
-            quit()
+            return
 
         ites = math.ceil(len(self.ref_paths) / BATCH_SIZE)
         embeddings_ref = np.zeros([len(self.ref_paths), self.tf_embeddings.shape[-1]], dtype=np.float32)
@@ -79,30 +112,6 @@ class FaceRecognition:
             self.dist_sess = tf.Session()
             self.dist_sess.run(tf.global_variables_initializer())
         self.dist_feed_dict = {self.tf_ref: embeddings_ref}
-
-    def inference(self, img_fr):
-        self.embedding_feed_dict[self.tf_input] = img_fr
-        embeddings_tar = self.embedding_sess.run(self.tf_embeddings, feed_dict=self.embedding_feed_dict)
-        self.dist_feed_dict[self.tf_tar] = embeddings_tar[0]
-        distance = self.dist_sess.run(self.tf_dist_embedding, feed_dict=self.dist_feed_dict)
-        arg = np.argmin(distance)
-        name = "Unknown"
-        if distance[arg] < THRESHOLD:
-            name = self.ref_paths[arg].split("\\")[-1].split(".")[0]
-        return name
-
-    def recognize(self, img_raw, bbox):
-        img_fr = self.preprocess(img_raw, bbox)
-        return self.inference(img_fr)
-
-    def preprocess(self, img, bbox):
-        img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        img_rgb = img_rgb.astype(np.float32)
-        img_rgb /= 255
-        img_fr = img_rgb[bbox[1]:bbox[1] + bbox[3], bbox[0]:bbox[0] + bbox[2], :]  # crop
-        img_fr = cv2.resize(img_fr, (self.model_shape[2], self.model_shape[1]))    # resize
-        img_fr = np.expand_dims(img_fr, axis=0)  # make 4 dimensions
-        return img_fr
 
     def import_model(self):
         with tf.Graph().as_default():

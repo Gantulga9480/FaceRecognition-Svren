@@ -14,6 +14,12 @@ export interface IDetectResponseData {
 }
 
 export interface IError {
-    reason: string,
-    message: string
+    code?: string,
+    status?: string
+}
+
+export interface IUser {
+    id: string,
+    name: string,
+    img_uri: string,
 }

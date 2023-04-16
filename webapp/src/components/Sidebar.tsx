@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from './Button'
 import { getMask, getArray } from '../utils/tools';
+import { useNavTransition } from '../utils/hooks';
 import homeIcon from '../assets/icons/house-line.svg'
 import adminIcon from '../assets/icons/lock-open-outline.svg'
 import videoIcon from '../assets/icons/media-library.svg'
@@ -16,13 +17,8 @@ let new_selected: boolean[] = getMask(navPath, location.pathname)
 
 export default function Sidebar() {
     const navigate = useNavigate();
+    const transition = useNavTransition(navigate)
     const [selected, setSelected] = useState(new_selected);
-    const viewNavigate = (newRoute: string) => {
-// @ts-ignore
-        if (!document.startViewTransition) return navigate(newRoute)
-// @ts-ignore
-        else return document.startViewTransition(() => navigate(newRoute))
-      };
 
     function switchNavBtn(id: number) {
         new_selected = getArray(false, navName.length);
@@ -31,17 +27,19 @@ export default function Sidebar() {
     }
 
     function onClick(id: number) {
-        viewNavigate(navPath[id]);
+        transition(navPath[id]);
         switchNavBtn(id);
     }
 
     return (
-        <div className="side-bar-container">
-            <div className='side-bar'>
-                {Array.from(navName, (elem: string, i) => {
-                    return <Button key={i} id={i} text={elem} icon={navIcon[i]} seleced={selected[i]} onClick={onClick}/>
-                })}
+        <nav>
+            <div className="side-bar-container">
+                <div className='side-bar'>
+                    {Array.from(navName, (elem: string, i) => {
+                        return <span key={i}><Button id={i} text={elem} icon={navIcon[i]} seleced={selected[i]} onClick={onClick} textAlign='left' resizable /></span>
+                    })}
+                </div>
             </div>
-        </div>
+        </nav>
     )
 }

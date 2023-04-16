@@ -1,3 +1,13 @@
 .Admin {
+    display: flex;
+    flex-direction: column;
     background-color: white;
+    padding: 20px;
+}
+
+.Admin-top {
+    position: relative;
+    display: flex;
+    justify-content: right;
+    margin-bottom: 10px;
 }
