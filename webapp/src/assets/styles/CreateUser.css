@@ -6,8 +6,31 @@
     align-items: center;
 }
 
+.Create > span {
+    width: 150px;
+    height: 50px;
+}
+
 .Create video {
     border-radius: 15px 15px 15px 15px;
     box-sizing: border-box;
     border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.Create-name {
+    margin-top: 30px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.Create-name > input {
+    width: 300px;
+    height: 40px;
+    font-size: 1.4em;
+    padding: 0 15px 0 15px;
+    border-top-style: hidden;
+    border-right-style: hidden;
+    border-left-style: hidden;
+    border-bottom-style: solid;
+    background-color: rgb(235, 234, 234);
 }

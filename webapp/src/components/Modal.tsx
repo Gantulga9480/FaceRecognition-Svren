@@ -9,11 +9,11 @@ export interface IModalProps {
 
 export default function Modal(props: IModalProps) {
 
-    function yesCallback(id: number) {
+    function yesCallback() {
         props.onYes()
     }
 
-    function noCallback(id: number) {
+    function noCallback() {
         props.onNo()
     }
 
@@ -26,10 +26,10 @@ export default function Modal(props: IModalProps) {
                 </div>
                 <div className="modal-btn">
                     <span>
-                        <Button id={1} text="Yes" onClick={yesCallback} seleced />
+                        <Button text="Yes" onClick={yesCallback} seleced />
                     </span>
                     <span>
-                        <Button id={0} text="No" onClick={noCallback} seleced />
+                        <Button text="No" onClick={noCallback} seleced />
                     </span>
                 </div>
             </div>

@@ -1,12 +1,11 @@
+import PageBody from '../components/PageBody'
 import anim from '../assets/animations/tail-spin.svg'
 import '../assets/styles/LoadingPage.css'
 
 export default function Loading() {
     return (
-        <div className='main-container'>
-            <div className='main-page Loading'>
-                <img src={anim} width={150} alt='loading' title='loading' ></img>
-            </div>
-        </div>
+        <PageBody className='Loading'>
+            <img src={anim} width={150} alt='loading' title='loading' ></img>
+        </PageBody>
     )
 }

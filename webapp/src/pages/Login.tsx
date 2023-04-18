@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useNavTransition } from "../utils/hooks";
 import { AutoPOST } from "../utils/requests";
 import { SERVER_ADMIN_LOGIN } from "../api_endpoints";
+import PageBody from "../components/PageBody";
 import '../assets/styles/Login.css'
 
 
@@ -36,8 +37,8 @@ export default function Login() {
     let error = fieldClass == "form-wrong form-field" ? true : false
 
     return (
-        <div className='main-container'>
-            <div className='main-page Login'>
+        <PageBody className="Login">
+            <>
                 <div className="Login-header">Log into admin dashboard</div>
                 <form onSubmit={handleSubmit}>
                     <div>
@@ -53,8 +54,8 @@ export default function Login() {
                 {error &&
                     <div className="login-error">
                         Wrong name or password
-                    </div>}
-            </div>
-        </div>
+                </div>}
+            </>
+        </PageBody>
     );
 }

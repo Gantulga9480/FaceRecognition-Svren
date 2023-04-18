@@ -1,20 +1,21 @@
 import '../assets/styles/button.css'
 
 interface IButton {
-    onClick: (id: number) => void,
-    id: number,
+    onClick: (id?: number) => void,
+    id?: number,
     text?: string
     icon?: any,
-    seleced?: boolean,
     textAlign?: string,
-    resizable?: boolean
+    seleced?: boolean,
+    resizable?: boolean,
+    disabled?: boolean
 }
 
 export default function Button(props: IButton) {
 
     function ButtonCallback(e: React.SyntheticEvent) {
         e.preventDefault();
-        props.onClick(props.id);
+        if (!props.disabled) props.onClick(props.id);
     }
 
     let classname = 'button prevent-select';

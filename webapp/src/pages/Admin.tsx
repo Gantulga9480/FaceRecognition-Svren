@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { AutoGET } from "../utils/requests";
 import { useNavTransition } from "../utils/hooks";
 import { SERVER_ADMIN } from "../api_endpoints";
+import PageBody from "../components/PageBody";
 import UserList from "../components/UserList";
 import Loading from "../components/Loading";
 import Button from "../components/Button";
@@ -14,8 +15,13 @@ export default function Admin() {
     const transition = useNavTransition(navigate)
     const [loading, setLoading] = useState(true)
 
-    function addPersonCallback(id: number) {
+    function addPersonCallback() {
         transition("/create")
+    }
+
+    function logoutCallback() {
+        sessionStorage.setItem('token', 'null')
+        transition("/login")
     }
 
     useEffect(() => {
@@ -34,14 +40,14 @@ export default function Admin() {
     ) : (
         <>
             <div className="Admin-top">
-                <div>
-                    <span><Button id={0} text="Add person" onClick={addPersonCallback} seleced /></span>
-                </div>
+                <span><Button text="Add person" onClick={addPersonCallback} seleced /></span>
+                <span style={{width: "30px"}}></span>
+                <span><Button text="Log out" onClick={logoutCallback} seleced /></span>
             </div>
             <UserList />
         </>
     )
 
-    return <div className='main-container'><div className='main-page Admin'>{page}</div></div>
+    return <PageBody className="Admin">{page}</PageBody>
 }
 

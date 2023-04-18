@@ -12,7 +12,7 @@ import deleteIcon from "../assets/icons/delete.svg"
 
 interface IUserProp {
     user: IUser
-    onClick: (id: number) => void
+    onClick: (id?: number) => void
 }
 
 export function User(props: IUserProp) {
@@ -44,7 +44,7 @@ export default function UserList() {
     const transition = useNavTransition(navigate)
 
     function modalYesCallback() {
-        setShowModal(false);
+        setShowModal(false)
         setLoading(true)
         AutoDELETE(`${SERVER_USER}/${nameid.id}`,
             (status) => {
@@ -54,12 +54,14 @@ export default function UserList() {
             }, (error) => transition('/error', {state: error, replace: true}))
     }
 
-    function buttonCb(id: number) {
+    function buttonCb(id?: number) {
         for (let i = 0; i < users.length; i++) {
-            if (users[i].id === id.toString()) {
-                setNameid({id: users[i].id, name: users[i].name})
-                setShowModal(true)
-                break
+            if (id) {
+                if (users[i].id === id.toString()) {
+                    setNameid({id: users[i].id, name: users[i].name})
+                    setShowModal(true)
+                    break
+                }
             }
         }
     }

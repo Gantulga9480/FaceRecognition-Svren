@@ -26,9 +26,13 @@ export default function Sidebar() {
         setSelected(new_selected)
     }
 
-    function onClick(id: number) {
-        transition(navPath[id]);
-        switchNavBtn(id);
+    function onClick(id?: number) {
+        console.log(id)
+        if (id !== undefined)
+        {
+            transition(navPath[id]);
+            switchNavBtn(id);
+        }
     }
 
     return (
