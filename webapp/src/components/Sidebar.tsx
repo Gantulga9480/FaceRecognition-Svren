@@ -27,7 +27,6 @@ export default function Sidebar() {
     }
 
     function onClick(id?: number) {
-        console.log(id)
         if (id !== undefined)
         {
             transition(navPath[id]);

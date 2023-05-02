@@ -8,7 +8,7 @@ import { FACE_RECOGNITION_URL } from '../api_endpoints';
 import { IDetectResponseData, IError } from '../api_endpoints.interface';
 import Loading from './Loading';
 
-export default function Camera() {
+export default function Camera(props: {getImg?: Function }) {
 
     const navigate = useNavigate()
     const transition = useNavTransition(navigate)
@@ -23,6 +23,9 @@ export default function Camera() {
     function predict() {
         if (webcamRef.current) {
             const data_uri = webcamRef.current.getScreenshot();
+            if (props.getImg) {
+                props.getImg(data_uri)
+            }
             if (data_uri) {
                 clearInterval(timer);
                 AutoPOST(FACE_RECOGNITION_URL, {img_uri: data_uri}, (data: IDetectResponseData) => {
