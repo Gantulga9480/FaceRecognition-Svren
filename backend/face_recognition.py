@@ -71,6 +71,7 @@ class FaceRecognition:
 
     def load_dist(self):
         self.ref_paths = []
+        self.dist_feed_dict = None
         for dirname, _, filenames in os.walk(self.ref_dir):
             if len(filenames) > 0:
                 for filename in filenames:
