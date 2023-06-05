@@ -15,11 +15,13 @@ export default function Button(props: IButton) {
 
     function ButtonCallback(e: React.SyntheticEvent) {
         e.preventDefault();
-        if (!props.disabled) props.onClick(props.id);
+        if (!props.disabled) {
+            props.onClick(props.id)
+        }
     }
 
-    let classname = 'button prevent-select';
-    classname += props.seleced ? ' button-selected' : '';
+    let classname = 'button prevent-select'
+    classname += props.seleced ? ' button-selected' : ''
     let textAlign: any = props.textAlign ? props.textAlign : 'center'
     let margin = (props.icon && props.text) ? "10px" : "0px"
     let textClass = props.resizable ? 'button-text hidden-half' : 'button-text'

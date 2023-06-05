@@ -13,7 +13,7 @@ else:
     tf.disable_v2_behavior()
 
 
-IMG_FORMAR = {'png', 'PNG', 'jpg', 'JPG', 'JPEG', 'bmp', 'BMP'}
+IMG_FORMAT = {'png', 'PNG', 'jpg', 'JPG', 'JPEG'}
 BATCH_SIZE = 32
 THRESHOLD = 0.8
 
@@ -43,7 +43,7 @@ class FaceRecognition:
         self.load_dist()
 
     def inference(self, img_fr):
-        if self.dist_feed_dict:
+        if self.dist_feed_dict is not None:
             self.embedding_feed_dict[self.tf_input] = img_fr
             embeddings_tar = self.embedding_sess.run(self.tf_embeddings, feed_dict=self.embedding_feed_dict)
             self.dist_feed_dict[self.tf_tar] = embeddings_tar[0]
@@ -71,13 +71,12 @@ class FaceRecognition:
 
     def load_dist(self):
         self.ref_paths = []
-        self.dist_feed_dict = None
-        for dirname, _, filenames in os.walk(self.ref_dir):
-            if len(filenames) > 0:
-                for filename in filenames:
-                    if filename.split(".")[-1] in IMG_FORMAR:
-                        self.ref_paths.append(os.path.join(dirname, filename))
+        for r, ds, fs in os.walk(self.ref_dir):
+            for f in fs:
+                if f.split(".")[-1] in IMG_FORMAT:
+                    self.ref_paths.append(os.path.join(r, f))
         if len(self.ref_paths) == 0:
+            self.dist_feed_dict = None
             print("No reference image for face recognition")
             return
 

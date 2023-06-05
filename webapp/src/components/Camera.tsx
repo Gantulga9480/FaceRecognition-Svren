@@ -4,31 +4,33 @@ import { useNavigate } from 'react-router-dom';
 import Webcam from 'react-webcam';
 import { AutoPOST } from '../utils/requests';
 import { useNavTransition } from '../utils/hooks';
-import { FACE_RECOGNITION_URL } from '../api_endpoints';
+import { SERVER_DETECT } from '../api_endpoints';
 import { IDetectResponseData, IError } from '../api_endpoints.interface';
 import Loading from './Loading';
 
-export default function Camera(props: {getImg?: Function }) {
+let disabeld: any = false
+let timer: number = 0
 
+export default function Camera(props: {getImg?: Function, disabled?: boolean}) {
+    disabeld = props.disabled
     const navigate = useNavigate()
     const transition = useNavTransition(navigate)
 
     const [names, setNames] = useState<string[]|null>([]);
     const [styles, setStyles] = useState<any[]>([]);
     const [count, setCount] = useState(0);
-    const [timer, setTimer] = useState(0);
     const [loading, setLoading] = useState(true)
     const webcamRef: any = useRef(null);
 
     function predict() {
         if (webcamRef.current) {
             const data_uri = webcamRef.current.getScreenshot();
-            if (props.getImg) {
+            if (props.getImg && !disabeld) {
                 props.getImg(data_uri)
             }
-            if (data_uri) {
+            if (data_uri && !disabeld) {
                 clearInterval(timer);
-                AutoPOST(FACE_RECOGNITION_URL, {img_uri: data_uri}, (data: IDetectResponseData) => {
+                AutoPOST(SERVER_DETECT, {img_uri: data_uri}, (data: IDetectResponseData) => {
                     if (data.preds.length > 0) {
                         let nms = []
                         let stls = []
@@ -46,13 +48,15 @@ export default function Camera(props: {getImg?: Function }) {
                     } else {
                         setNames(null);
                     }
-                    setTimer(0)
+                    timer = setInterval(predict, 300)
                 }, (error) => {
                     transition('/error', {state: error, replace: true})
                 })
             } else {
                 setCount(count + 1)
             }
+        } else {
+            clearInterval(timer)
         }
     }
 
@@ -67,8 +71,8 @@ export default function Camera(props: {getImg?: Function }) {
     }, [count])
 
     useEffect(() => {
-        clearInterval(timer);
-        setTimer(setInterval(predict, 300))
+        clearInterval(timer)
+        timer = setInterval(predict, 300)
     }, [])
 
     return (

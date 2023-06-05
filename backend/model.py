@@ -1,3 +1,14 @@
+import tensorflow as tf
+gpus = tf.config.list_physical_devices('GPU')
+if gpus:
+    try:
+        # Currently, memory growth needs to be the same across GPUs
+        for gpu in gpus:
+            tf.config.experimental.set_memory_growth(gpu, True)
+            logical_gpus = tf.config.list_logical_devices('GPU')
+            print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
+    except RuntimeError as e:
+        print('growth set failed -------------------')
 from face_detection import FaceDetection
 from face_recognition import FaceRecognition
 
@@ -22,7 +33,6 @@ class Model:
 
     def detect(self, img):
         names = []
-        boxes = []
         bboxes, re_confidence, re_mask_id = self.face_detect.detect(img)
         if len(bboxes) > 0:
             for i, bbox in enumerate(bboxes):
@@ -32,9 +42,4 @@ class Model:
                 # confi = round(re_confidence[i], 2)
                 # class_id = re_mask_id[i]
                 # color = (0, 255, 0) if class_id == 0 else (0, 0, 255)  # BGR
-                # cv2.rectangle(img, (bbox[0], bbox[1]), (bbox[0] + bbox[2], bbox[1] + bbox[3]), color, 2)
-                boxes.append(bbox)
-                # display_msg = "{},{},{}".format(self.face_detect.id2class[class_id], confi, name)
-                # result_coor = (bbox[0] + 2, bbox[1] - 2)
-                # cv2.putText(img, display_msg, result_coor, cv2.FONT_HERSHEY_SIMPLEX, 0.8, color)
-        return names, boxes
+        return names, bboxes

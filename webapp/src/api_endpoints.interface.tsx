@@ -21,5 +21,8 @@ export interface IError {
 export interface IUser {
     id: string,
     name: string,
-    img_uri: string,
+    image_info: {
+        image_ids: string[],
+        images: string[],
+    },
 }

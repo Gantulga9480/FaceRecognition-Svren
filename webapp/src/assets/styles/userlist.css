@@ -30,7 +30,7 @@
 }
 
 .user-id {
-    margin-right: 50px;
+    margin-right: 100px;
 }
 
 .user-name {
@@ -38,5 +38,46 @@
 }
 
 .user-image {
+    position: relative;
+    margin-right: 10px;
+    height: 100%;
+}
+
+.user-image img {
     width: 40px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+}
+
+.user-delete-btn {
+    display: flex;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+.user-delete-btn img {
+    width: 24px;
+}
+
+.user-delete-btn span {
+    background-color: rgba(200, 200, 200, 0.5);
+    border-radius: 20px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: var(--global-transition);
+}
+
+.user-delete-btn span:hover {
+    opacity: 1;
 }

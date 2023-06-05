@@ -3,15 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import Button from './Button'
 import { getMask, getArray } from '../utils/tools';
 import { useNavTransition } from '../utils/hooks';
-import homeIcon from '../assets/icons/house-line.svg'
 import adminIcon from '../assets/icons/lock-open-outline.svg'
 import videoIcon from '../assets/icons/media-library.svg'
 import aboutIcon from '../assets/icons/community.svg'
+import camereIcon from '../assets/icons/Camera.svg'
+import folderIcon from '../assets/icons/Folder.svg'
 import '../assets/styles/sidebar.css'
 
-const navName = ['Home', 'Video', 'Adminstration', 'About us']
-const navPath = ['/', '/video', '/admin', '/about']
-const navIcon = [homeIcon, videoIcon, adminIcon, aboutIcon]
+const navName = ['Camera', 'Video', 'Image','Adminstration', 'About us']
+const navPath = ['/', '/video', '/image','/admin', '/about']
+const navIcon = [camereIcon, videoIcon, folderIcon, adminIcon, aboutIcon]
 
 let new_selected: boolean[] = getMask(navPath, location.pathname)
 

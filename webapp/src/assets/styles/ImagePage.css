@@ -1,0 +1,55 @@
+.ImagePage {
+    padding: 20px;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+}
+
+.ImagePage .file-input {
+    cursor: pointer;
+}
+
+.ImagePage .file-input input {
+    display: none;
+}
+
+.image-submit-form {
+    margin-bottom: 20px;
+    display: flex;
+}
+
+.image-submit-form span {
+    width: max-content;
+}
+
+.image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.image {
+    position: relative;
+}
+
+.image img {
+    border-radius: 15px;
+}
+
+.image > p {
+    position: absolute;
+    background-color: white;
+    margin: 0;
+    font-size: 20px;
+    font-weight: bold;
+    box-sizing: border-box;
+    border-radius: 5px 5px 5px 5px;
+    padding: 0px 8px 0px 8px;
+}
+
+.image-overlay {
+    position: absolute;
+    border: 2px solid red;
+    z-index: 1;
+}

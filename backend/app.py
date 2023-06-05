@@ -1,10 +1,11 @@
 from flask import Flask, request
-from model import Model
 from flask_cors import CORS
-from model import Model
-import uuid
 import cv2
-from utils import makeIMGfromURI, returnStatus, get_users, get_user, delete_user, save_user
+import uuid
+from model import Model
+from utils import (makeIMGfromURI, makeURIfromIMG, returnStatus, get_users_info,
+                   get_user_info, delete_user, delete_user_img, add_user,
+                   saved_users, add_user_img)
 
 
 token = str(uuid.uuid1())
@@ -24,7 +25,7 @@ def index():
 @app.get('/admin')
 def admin():
     admin_token = request.args.get("token", None, type=str)
-    if admin_token:
+    if admin_token is not None:
         if admin_token == token:
             return returnStatus(status="ok", code=200)
         return returnStatus(status="Unauthorized", code=401)
@@ -56,17 +57,54 @@ def detect():
         img = makeIMGfromURI(img_uri)
     except Exception:
         return returnStatus(status="Bad request - Invalid image URI", code=400)
-    names, boxes = model.detect(img)
-    preds = [{"name": names[i], "box": boxes[i]} for i in range(len(names))]
+    names, bboxes = model.detect(img)
+    preds = [{"name": names[i], "box": bboxes[i]} for i in range(len(names))]
     return returnStatus(data={"preds": preds})
+
+
+@app.post("/detect-annot")
+def detect_annot():
+    data = request.get_json(silent=True)
+    try:
+        img_uri = data['img_uri']
+    except KeyError:
+        return returnStatus(status="Bad request - key 'img_uri' value not provided", code=400)
+    try:
+        img = makeIMGfromURI(img_uri)
+    except Exception:
+        return returnStatus(status="Bad request - Invalid image URI", code=400)
+    org_img = img.copy()
+    names, bboxes = model.detect(img)
+    for i, bbox in enumerate(bboxes):
+        color = (0, 255, 0) if names[i] != "Unknown" else (0, 0, 255)
+        cv2.rectangle(org_img, (bbox[0], bbox[1]), (bbox[0] + bbox[2], bbox[1] + bbox[3]), color, 2)
+        display_msg = "{}".format(names[i])
+        result_coor = (bbox[0] + 2, bbox[1] - 2)
+        cv2.putText(org_img, display_msg, result_coor, cv2.FONT_HERSHEY_SIMPLEX, 0.8, color)
+    img_uri = makeURIfromIMG(org_img)
+    return returnStatus(data={'img_uri': img_uri})
+
+
+@app.get("/users-info")
+def users_info():
+    admin_token = request.args.get("token", None, type=str)
+    if admin_token is not None:
+        if admin_token == token:
+            data = saved_users()
+            users_info = []
+            for id, name in data:
+                users_info.append({'id': id, 'name': name})
+            return returnStatus(data=users_info, status="ok", code=200)
+        return returnStatus(status="Unauthorized", code=401)
+    return returnStatus(status="Bad request", code=400)
 
 
 @app.get("/users")
 def users():
     admin_token = request.args.get("token", None, type=str)
-    if admin_token:
+    if admin_token is not None:
         if admin_token == token:
-            users_info = get_users()
+            users_info = get_users_info()
             return returnStatus(data=users_info, status="ok", code=200)
         return returnStatus(status="Unauthorized", code=401)
     return returnStatus(status="Bad request", code=400)
@@ -79,7 +117,7 @@ def user():
     user_name = request.args.get("name", None, type=str)
     if admin_token and user_name:
         if admin_token == token:
-            user_info = get_user(user_id, user_name)
+            user_info = get_user_info(user_id, user_name)
             return returnStatus(data=user_info, status="ok", code=200)
         return returnStatus(status="Unauthorized", code=401)
     return returnStatus(status="Bad request", code=400)
@@ -96,21 +134,72 @@ def user_delete(id):
     return returnStatus(status="Bad request", code=400)
 
 
+@app.delete("/user/<id>/<count>")
+def user_delete_img(id, count):
+    if id and count:
+        if delete_user_img(id, count):
+            model.refresh_face_dist()
+            return returnStatus(status="ok", code=200)
+        else:
+            return returnStatus(status="Not found", code=404)
+    return returnStatus(status="Bad request", code=400)
+
+
+@app.post("/user/add-img")
+def user_add_img():
+    data = request.get_json(silent=True)
+    try:
+        admin_token = data["token"]
+        if admin_token != token:
+            return returnStatus(status="Unauthorized", code=401)
+    except KeyError:
+        return returnStatus(status="Bad request", code=400)
+
+    try:
+        id = data["id"]
+        name = data["name"]
+        img_uri = data["img_uri"]
+    except KeyError:
+        return returnStatus(status="Bad request", code=400)
+
+    try:
+        img = makeIMGfromURI(img_uri)
+    except Exception:
+        return returnStatus(status="Bad request - Invalid image URI", code=400)
+
+    face = model.crop_face(img)
+    if face is not None:
+        add_user_img(id, name, face)
+        model.refresh_face_dist()
+    else:
+        return returnStatus(status="warn", code=200)
+    return returnStatus(status="ok", code=200)
+
+
 @app.post("/user/add")
 def user_add():
     data = request.get_json(silent=True)
+    try:
+        admin_token = data["token"]
+        if admin_token != token:
+            return returnStatus(status="Unauthorized", code=401)
+    except KeyError:
+        return returnStatus(status="Bad request", code=400)
+
     try:
         name = data["name"]
         img_uri = data["img_uri"]
     except KeyError:
         return returnStatus(status="Bad request", code=400)
+
     try:
         img = makeIMGfromURI(img_uri)
     except Exception:
         return returnStatus(status="Bad request - Invalid image URI", code=400)
+
     face = model.crop_face(img)
     if face is not None:
-        save_user(name, face)
+        add_user(name, face)
         model.refresh_face_dist()
     else:
         return returnStatus(status="warn", code=200)
