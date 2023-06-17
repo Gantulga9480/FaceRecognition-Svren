@@ -1,0 +1,26 @@
+.input-wrapper {
+    position: relative;
+    background-color: rgb(240, 240, 240);
+    border-radius: 15px;
+    width: max-content;
+}
+
+.input-wrapper .input-text {
+    padding: 10px 15px 10px 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+.input-text > input {
+    border-top-style: hidden;
+    border-right-style: hidden;
+    border-left-style: hidden;
+    border-bottom-style: solid;
+    font-size: 1rem;
+    width: 300px;
+}
+
+.input-wrapper .input-button {
+    cursor: pointer;
+    padding: 10px 15px 10px 15px;
+}
