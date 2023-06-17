@@ -5,11 +5,11 @@
     flex-direction: column;
 }
 
-.ImagePage .file-input {
+.file-input {
     cursor: pointer;
 }
 
-.ImagePage .file-input input {
+.file-input input {
     display: none;
 }
 
@@ -23,6 +23,7 @@
 }
 
 .image-container {
+    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -30,11 +31,14 @@
 }
 
 .image {
-    position: relative;
+    position: absolute;
 }
 
-.image img {
+.image-container img {
     border-radius: 15px;
+    position: absolute;
+    top: 0px;
+    width: 50%;
 }
 
 .image > p {

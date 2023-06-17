@@ -7,7 +7,7 @@ import uuid
 import shutil
 
 
-IMG_ROOT = 'users'
+IMG_ROOT = r'users'
 MAX_IMG_PER_USER = 100
 
 
@@ -45,7 +45,7 @@ def get_user_info(id: str, name: str):
     image_ids = []
     for file in files:
         root, f = os.path.split(file)
-        img_id = f.split('.')[-3]
+        img_id = f.split('.')[-2]
         raw_img = cv2.imread(file)
         uri = makeURIfromIMG(raw_img)
         images.append(uri)
@@ -68,7 +68,7 @@ def add_user(name, face):
     except FileExistsError:
         shutil.rmtree(save_path)
         os.makedirs(save_path)
-    cv2.imwrite(os.path.join(save_path, f'0.{name}.jpg'), face)
+    cv2.imwrite(os.path.join(save_path, f'{name}.0.jpg'), face)
 
 
 def add_user_img(id, name, face):
@@ -76,13 +76,13 @@ def add_user_img(id, name, face):
     save_path = os.path.join(IMG_ROOT, f"{id}.{name}")
     for r, ds, fs in os.walk(save_path):
         for f in fs:
-            counts.append(f.split('.')[0])
+            counts.append(f.split('.')[1])
     new_count = 0
     while True:
         new_count = np.random.randint(MAX_IMG_PER_USER)
         if new_count not in counts:
             break
-    cv2.imwrite(os.path.join(save_path, f'{new_count}.{name}.jpg'), face)
+    cv2.imwrite(os.path.join(save_path, f'{name}.{new_count}.jpg'), face)
 
 
 def delete_user(user_id):
@@ -107,7 +107,7 @@ def delete_user_img(user_id, count):
                     except FileNotFoundError:
                         return False
                 break
-            path = os.path.join(IMG_ROOT, f"{id}.{name}", f"{count}.{name}.jpg")
+            path = os.path.join(IMG_ROOT, f"{id}.{name}", f"{name}.{count}.jpg")
             try:
                 os.remove(path)
                 return True

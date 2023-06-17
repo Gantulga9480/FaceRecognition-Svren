@@ -1,6 +1,9 @@
 export const SERVER_INDEX: string = 'http://127.0.0.1:5000'
 export const SERVER_DETECT: string = `${SERVER_INDEX}/detect`
 export const SERVER_DETECT_ANNOT: string = `${SERVER_DETECT}-annot`
+export const SERVER_FIND_PERSON_START: string = `${SERVER_INDEX}/find-person-start`
+export const SERVER_FIND_PERSON_STOP: string = `${SERVER_INDEX}/find-person-stop`
+export const SERVER_FIND_PERSON_FORWARD: string = `${SERVER_INDEX}/find-person-forward`
 export const SERVER_ADMIN: string = `${SERVER_INDEX}/admin`
 export const SERVER_ADMIN_LOGIN: string = `${SERVER_ADMIN}-login`
 export const SERVER_USERS_INFO: string = `${SERVER_INDEX}/users-info`

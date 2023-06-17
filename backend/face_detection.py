@@ -33,8 +33,9 @@ class FaceDetection:
         self.iou_thresh = 0.5
 
     def detect(self, img_raw):
+        height, width, _ = img_raw.shape
         img_fd = self.preprocess(img_raw)
-        return self.inference(img_fd)
+        return self.inference(img_fd, height, width)
 
     def preprocess(self, img):
         img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -44,9 +45,9 @@ class FaceDetection:
         img_fd = np.expand_dims(img_fd, axis=0)
         return img_fd
 
-    def inference(self, img_4d):
-        ori_height = 480
-        ori_width = 640
+    def inference(self, img_4d, height, width):
+        ori_height = height
+        ori_width = width
         re_boxes = []
         re_confidence = []
         re_class_id = []

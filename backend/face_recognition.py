@@ -20,7 +20,7 @@ THRESHOLD = 0.8
 
 class FaceRecognition:
 
-    def __init__(self, path, ref_dir) -> None:
+    def __init__(self, path) -> None:
         self.path = path
         self.node_dict = {'input': 'input:0',
                           'keep_prob': 'keep_prob:0',
@@ -37,10 +37,8 @@ class FaceRecognition:
             self.embedding_feed_dict[self.tf_dict['keep_prob']] = 1.0
         if 'phase_train' in self.tf_dict.keys():
             self.embedding_feed_dict[self.tf_dict['phase_train']] = False
-        self.ref_dir = ref_dir
         self.ref_paths = []
         self.dist_feed_dict = None
-        self.load_dist()
 
     def inference(self, img_fr):
         if self.dist_feed_dict is not None:
@@ -51,10 +49,11 @@ class FaceRecognition:
             arg = np.argmin(distance)
             name = "Unknown"
             if distance[arg] < THRESHOLD:
-                name = self.ref_paths[arg].split("\\")[-1].split(".")[1]
-            return name
+                r, f = os.path.split(self.ref_paths[arg])
+                name = f.split('.')[0]
+            return name, embeddings_tar[0]
         else:
-            return "Unknown"
+            return "Unknown", None
 
     def recognize(self, img_raw, bbox):
         img_fr = self.preprocess(img_raw, bbox)
@@ -69,9 +68,33 @@ class FaceRecognition:
         img_fr = np.expand_dims(img_fr, axis=0)  # make 4 dimensions
         return img_fr
 
-    def load_dist(self):
+    def add_embed(self, embed, ref_dir):
         self.ref_paths = []
-        for r, ds, fs in os.walk(self.ref_dir):
+        for r, ds, fs in os.walk(ref_dir):
+            for f in fs:
+                if f.split(".")[-1] in IMG_FORMAT:
+                    self.ref_paths.append(os.path.join(r, f))
+        if len(self.ref_paths) == 0:
+            self.dist_feed_dict = None
+            print("No reference image for face recognition")
+            return
+        if self.dist_feed_dict is None:
+            self.load_embed(ref_dir)
+        else:
+            embeddings_ref = np.zeros([len(self.ref_paths), self.tf_embeddings.shape[-1]], dtype=np.float32)
+            embeddings_ref[:len(self.ref_paths) - 1] = self.dist_feed_dict[self.tf_ref]
+            embeddings_ref[len(self.ref_paths) - 1] = embed
+            with tf.Graph().as_default():
+                self.tf_tar = tf.placeholder(dtype=tf.float32, shape=self.tf_embeddings.shape[-1])
+                self.tf_ref = tf.placeholder(dtype=tf.float32, shape=self.tf_embeddings.shape)
+                self.tf_dist_embedding = tf.sqrt(tf.reduce_sum(tf.square(tf.subtract(self.tf_ref, self.tf_tar)), axis=1))
+                self.dist_sess = tf.Session()
+                self.dist_sess.run(tf.global_variables_initializer())
+            self.dist_feed_dict = {self.tf_ref: embeddings_ref}
+
+    def load_embed(self, ref_dir):
+        self.ref_paths = []
+        for r, ds, fs in os.walk(ref_dir):
             for f in fs:
                 if f.split(".")[-1] in IMG_FORMAT:
                     self.ref_paths.append(os.path.join(r, f))

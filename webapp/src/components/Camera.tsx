@@ -79,7 +79,7 @@ export default function Camera(props: {getImg?: Function, disabled?: boolean}) {
         <>
             {loading && <Loading />}
             <div className="web-camera">
-                <Webcam screenshotFormat='image/jpeg' ref={webcamRef} videoConstraints={{width: 640, height: 480, facingMode: "user"}} />
+                <Webcam screenshotFormat='image/jpeg' ref={webcamRef} videoConstraints={{width: 1280, height: 720, facingMode: "user"}} />
                 {names && Array.from(styles, (style: object, i) => {
                     return <div key={i} className='webcam-overlay' style={style}></div>
                 })}
