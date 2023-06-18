@@ -16,15 +16,30 @@ class Model:
         self.face_detect = FaceDetection(r'face_mask_detection.pb')
         self.face_recognition = FaceRecognition(r"Facenet_masked_model.pb")
         self.face_recognition.load_embed(DEFAULT_REF_PATH)
+        self.current_ref = DEFAULT_REF_PATH
         self.cap = None
         self.cap_frame_count = 0
         self.cap_frame_rate = 0
         self.cap_frame_counter = 0
         self.cap_frame_buffer = []
         self.cap_timestamp_buffer = []
+        self.cap_save_count = 0
+        try:
+            os.mkdir(DEFAULT_REF_PATH)
+        except FileExistsError:
+            pass
+        try:
+            os.mkdir(FIND_PERSON_REF_PATH)
+        except FileExistsError:
+            pass
+        try:
+            os.mkdir(FIND_ALL_REF_PATH)
+        except FileExistsError:
+            pass
 
-    def refresh_face_dist(self):
-        self.face_recognition.load_embed(DEFAULT_REF_PATH)
+    def change_ref(self, ref_path):
+        self.current_ref = ref_path
+        self.face_recognition.load_embed(ref_path)
 
     def crop_face(self, img):
         bboxes, re_confidence, re_mask_id = self.face_detect.detect(img)
@@ -38,23 +53,31 @@ class Model:
     def cap_forward(self):
         current_batch_count = 0
         frame_copy = None
-        while current_batch_count < 10:
+        while current_batch_count < 30:
             ret, frame = self.cap.read()
             if ret:
                 frame_copy = frame.copy()
                 if self.cap_frame_counter % (self.cap_frame_rate // 2) == 0:
                     bboxes, re_confidence, re_mask_id = self.face_detect.detect(frame)
                     for i, bbox in enumerate(bboxes):
-                        name, _ = self.face_recognition.recognize(frame, bbox)
-                        if name != "Unknown":
+                        name, embed = self.face_recognition.recognize(frame, bbox)
+                        if name != "Unknown" and self.current_ref == FIND_PERSON_REF_PATH:
                             img_temp = frame_copy[bbox[1]:bbox[1] + bbox[3], bbox[0]:bbox[0] + bbox[2], :]
                             time_seconds = int(self.cap.get(cv2.CAP_PROP_POS_MSEC) // 1000)
                             self.cap_frame_buffer.append(img_temp)
                             self.cap_timestamp_buffer.append(time_seconds)
-                            # save_path = f"{name}_{time_seconds}_{save_count}.jpg"
-                            # save_path = os.path.join(FIND_PERSON_REF_PATH + '_temp', save_path)
-                            # cv2.imwrite(save_path, img_temp)
+                            print("Person found at {}".format(time_seconds))
+                        elif name == "Unknown" and self.current_ref == FIND_ALL_REF_PATH:
+                            img_temp = frame_copy[bbox[1]:bbox[1] + bbox[3], bbox[0]:bbox[0] + bbox[2], :]
+                            time_seconds = int(self.cap.get(cv2.CAP_PROP_POS_MSEC) // 1000)
+                            self.cap_frame_buffer.append(img_temp)
+                            self.cap_timestamp_buffer.append(time_seconds)
                             print("An unknown person found at {}".format(time_seconds))
+                            save_path = f"person_{time_seconds}_{self.cap_save_count}.jpg"
+                            save_path = os.path.join(FIND_ALL_REF_PATH, save_path)
+                            cv2.imwrite(save_path, img_temp)
+                            self.cap_save_count += 1
+                            self.face_recognition.add_embed(embed, FIND_ALL_REF_PATH)
                 self.cap_frame_counter += 1
                 current_batch_count += 1
             else:
@@ -67,16 +90,17 @@ class Model:
         self.cap = cv2.VideoCapture(video_path)
         self.cap_frame_count = int(self.cap.get(cv2.CAP_PROP_FRAME_COUNT))
         self.cap_frame_rate = int(self.cap.get(cv2.CAP_PROP_FPS))
+        self.cap_save_count = 0
         self.cap_frame_counter = 0
-        self.cap_frame_buffer = []
-        self.cap_timestamp_buffer = []
+        self.cap_frame_buffer.clear()
+        self.cap_timestamp_buffer.clear()
 
     def cap_deinit(self):
         if self.cap is not None:
             self.cap.release()
         self.cap_frame_counter = 0
-        self.cap_frame_buffer = []
-        self.cap_timestamp_buffer = []
+        self.cap_frame_buffer.clear()
+        self.cap_timestamp_buffer.clear()
 
     def detect(self, img):
         names = []
@@ -85,8 +109,4 @@ class Model:
             for i, bbox in enumerate(bboxes):
                 name, _ = self.face_recognition.recognize(img, bbox)
                 names.append(name)
-                # ----display results
-                # confi = round(re_confidence[i], 2)
-                # class_id = re_mask_id[i]
-                # color = (0, 255, 0) if class_id == 0 else (0, 0, 255)  # BGR
         return names, bboxes

@@ -6,7 +6,7 @@ import { SERVER_USER, SERVER_USERS } from "../api_endpoints"
 import { IUser } from "../api_endpoints.interface"
 import Loading from "../components/Loading";
 import Button from "./Button";
-import Modal from "./Modal";
+import { ModalConfirm } from "./Modal";
 import deleteIcon from "../assets/icons/delete.svg"
 import "../assets/styles/userlist.css"
 
@@ -117,9 +117,9 @@ export default function UserList() {
         <>
             {loading && <Loading />}
             <div className="users">
-                {showmodal && <Modal title={`Are you sure you want to delete ${currentIdName.name}?`}
-                                    onNo={() => setShowModal(false)}
-                                    onYes={modalYesCallback} />}
+                {showmodal && <ModalConfirm title={`Are you sure you want to delete ${currentIdName.name}?`}
+                                            onNo={() => setShowModal(false)}
+                                            onYes={modalYesCallback} />}
                 <div className="users-list">
                     {Array.from(users, (user: IUser, i) => {
                         return <User key={i} btnid={i} user={user} onClick={buttonCb}

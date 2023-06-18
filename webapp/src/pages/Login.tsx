@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { useNavTransition } from "../utils/hooks";
 import { AutoPOST } from "../utils/requests";
 import { SERVER_ADMIN_LOGIN } from "../api_endpoints";
-import PageBody from "../components/PageBody";
 import '../assets/styles/Login.css'
 
 
@@ -37,25 +36,23 @@ export default function Login() {
     let error = fieldClass == "form-wrong form-field" ? true : false
 
     return (
-        <PageBody className="Login">
-            <>
-                <div className="Login-header">Log into admin dashboard</div>
-                <form onSubmit={handleSubmit}>
-                    <div>
-                    <input className={fieldClass} type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="User Name" required />
-                    </div>
-                    <div>
-                    <input className={fieldClass} type="password" value={pass} onChange={(e) => setPass(e.target.value)} placeholder="Password" required />
-                    </div>
-                    <div>
-                    <input className="form-button" type="submit" value="Log in"/>
-                    </div>
-                </form>
-                {error &&
-                    <div className="login-error">
-                        Wrong name or password
-                </div>}
-            </>
-        </PageBody>
+        <div className="Login">
+            <div className="Login-header">Log into admin dashboard</div>
+            <form onSubmit={handleSubmit}>
+                <div>
+                <input className={fieldClass} type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="User Name" required />
+                </div>
+                <div>
+                <input className={fieldClass} type="password" value={pass} onChange={(e) => setPass(e.target.value)} placeholder="Password" required />
+                </div>
+                <div>
+                <input className="form-button" type="submit" value="Log in"/>
+                </div>
+            </form>
+            {error &&
+                <div className="login-error">
+                    Wrong name or password
+            </div>}
+        </div>
     );
 }

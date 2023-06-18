@@ -1,11 +1,8 @@
-export default function PageBody(props: {className?: string, children?: JSX.Element}) {
-
-    let main_page_class = 'main-page '
-    main_page_class += props.className ? props.className : ''
+export default function PageBody(props: {children?: JSX.Element}) {
 
     return (
         <div className='main-container'>
-            <div className={main_page_class}>
+            <div className='main-page '>
                 {props.children}
             </div>
         </div>

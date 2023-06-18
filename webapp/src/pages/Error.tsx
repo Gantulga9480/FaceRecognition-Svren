@@ -1,8 +1,7 @@
 import { useLocation } from "react-router-dom"
 import errorIcon from '../assets/icons/error_icon.svg'
-import '../assets/styles/Error.css'
 import { IError } from "../api_endpoints.interface"
-import PageBody from "../components/PageBody"
+import '../assets/styles/Error.css'
 
 export default function Error(props: IError) {
 
@@ -41,8 +40,8 @@ export default function Error(props: IError) {
     )
 
     return (
-        <PageBody className="Error">
+        <div className="Error">
             {page}
-        </PageBody>
+        </div>
     )
 }

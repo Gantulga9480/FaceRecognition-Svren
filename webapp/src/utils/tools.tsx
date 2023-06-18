@@ -11,3 +11,9 @@ export function getMask(array: any[], value: any) {
     }
     return mask
 }
+
+export function toTime(S: number) {
+    let m = Math.floor(S / 60)
+    let s = S - m * 60
+    return `${m}:${s}`
+}

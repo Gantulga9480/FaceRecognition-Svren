@@ -2,8 +2,7 @@
     display: flex;
     justify-content: space-evenly;
     align-items: center;
-    background-color: white;
-    transition: 500ms;
+    height: 100%;
 }
 
 .About-image  {

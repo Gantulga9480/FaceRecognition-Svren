@@ -22,6 +22,11 @@ def returnStatus(data: str = None, status: str = "Successful", code: int = 200):
     return res
 
 
+def saveVIDEOfromURI(uri: str, path: str):
+    with open(path, 'wb') as f:
+        f.write(base64.b64decode(uri.split(',')[1]))
+
+
 def makeIMGfromURI(uri: str):
     encoded_data = uri.split(',')[1]
     nparr = np.frombuffer(base64.b64decode(encoded_data), np.uint8)
@@ -30,7 +35,7 @@ def makeIMGfromURI(uri: str):
 
 
 def makeURIfromIMG(img) -> str:
-    byte_img = np.array(cv2.imencode('.png', img)[1]).tobytes()
+    byte_img = np.array(cv2.imencode('.jpg', img)[1]).tobytes()
     img64 = base64.b64encode(byte_img).decode('utf-8')
     return f"data:image/jpeg;base64,{img64}"
 

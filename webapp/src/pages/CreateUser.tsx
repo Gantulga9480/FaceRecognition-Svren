@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from 'react-router-dom';
 import { useNavTransition } from '../utils/hooks';
-import PageBody from "../components/PageBody";
 import Button from "../components/Button";
 import Loading from "../components/Loading";
 import Camera from "../components/Camera";
-import Modal from "../components/Modal";
+import { ModalConfirm } from "../components/Modal";
 import { AutoGET, AutoPOST } from "../utils/requests";
 import { SERVER_USERS_INFO, SERVER_USER_ADD, SERVER_USER_ADD_IMG } from "../api_endpoints";
 import { IError } from "../api_endpoints.interface";
@@ -65,7 +64,7 @@ export default function CreateUser() {
                 setLoading(true)
                 setBtnDisabled(true)
                 for (let i = 0; i < usersInfo.length; i++) {
-                    if (name === usersInfo[i].name) {
+                    if (name.toUpperCase() === usersInfo[i].name) {
                         setId(usersInfo[i].id)
                         setShowModal(true)
                         return
@@ -73,7 +72,7 @@ export default function CreateUser() {
                 }
                 let token = sessionStorage.getItem('token')
                 AutoPOST(SERVER_USER_ADD,
-                    {name: name, img_uri: image, token: token},
+                    {name: name.toUpperCase(), img_uri: image, token: token},
                     (data, status) => {
                         setTimeout(() => {
                             setLoading(false)
@@ -114,19 +113,19 @@ export default function CreateUser() {
     }, [refresh])
 
     return (
-        <PageBody className="Create">
-            <>
-                {loading && <Loading />}
-                {showmodal && <Modal title={`User ${name} aleady exists. Add new image to ${name}?`}
-                                     onNo={modalNoCallback}
-                                     onYes={modalYesCallback} />}
+        <>
+            {loading && <Loading />}
+            <div className="Create">
+                {showmodal && <ModalConfirm title={`User ${name} aleady exists. Add new image to ${name}?`}
+                                            onNo={modalNoCallback}
+                                            onYes={modalYesCallback} />}
                 <Camera getImg={setImage} disabled={camDisabled}/>
                 <div className="Create-name">
-                    <input type="text" value={name} placeholder="Enter user name" onChange={(e) => { setName(e.target.value); setNameError(false) }} required/>
+                    <input type="text" value={name} placeholder="Enter user name" onChange={(e) => { setName(e.target.value); setNameError(false) }} required />
                     {nameError && <p style={{color: "red"}}>Please provide user name</p>}
                 </div>
                 <span><Button id={0} text="Submit" onClick={onSubmit} seleced disabled={btnDisabled}/></span>
-            </>
-        </PageBody>
+            </div>
+        </>
     )
 }

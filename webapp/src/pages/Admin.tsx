@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { AutoGET } from "../utils/requests";
 import { useNavTransition } from "../utils/hooks";
 import { SERVER_ADMIN } from "../api_endpoints";
-import PageBody from "../components/PageBody";
 import UserList from "../components/UserList";
 import Loading from "../components/Loading";
 import Button from "../components/Button";
@@ -48,6 +47,6 @@ export default function Admin() {
         </>
     )
 
-    return <PageBody className="Admin">{page}</PageBody>
+    return <div className="Admin">{ page }</div>
 }
 

@@ -1,6 +1,24 @@
 .Video {
-    background-color: white;
     display: flex;
     flex-direction: column;
     padding: 20px;
+}
+
+.result-container {
+    margin-top: 70px;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.result {
+    margin-right: 5px;
+    margin-left: 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.result > img {
+    width: 60px;
+    height: 80px;
 }

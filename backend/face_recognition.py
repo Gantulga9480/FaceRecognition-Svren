@@ -69,7 +69,7 @@ class FaceRecognition:
         return img_fr
 
     def add_embed(self, embed, ref_dir):
-        self.ref_paths = []
+        self.ref_paths.clear()
         for r, ds, fs in os.walk(ref_dir):
             for f in fs:
                 if f.split(".")[-1] in IMG_FORMAT:
@@ -93,7 +93,7 @@ class FaceRecognition:
             self.dist_feed_dict = {self.tf_ref: embeddings_ref}
 
     def load_embed(self, ref_dir):
-        self.ref_paths = []
+        self.ref_paths.clear()
         for r, ds, fs in os.walk(ref_dir):
             for f in fs:
                 if f.split(".")[-1] in IMG_FORMAT:

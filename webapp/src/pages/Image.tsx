@@ -1,82 +1,116 @@
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { useNavigate } from "react-router-dom"
-import PageBody from "../components/PageBody"
-import Loading from "./LoadingPage"
+import Loading from "../components/Loading"
+import { InputButton, InputFile } from "../components/Input"
+import { ModalTextInput, ModalNotify } from "../components/Modal"
 import { useNavTransition } from "../utils/hooks"
 import { AutoPOST } from "../utils/requests"
-import { SERVER_DETECT, SERVER_DETECT_ANNOT } from "../api_endpoints"
+import { SERVER_DETECT, SERVER_USER_ADD } from "../api_endpoints"
 import { IDetectResponseData } from "../api_endpoints.interface"
 import '../assets/styles/ImagePage.css'
 
 
-export default function ImagePage(props: any) {
+export default function ImagePage() {
 
     const navigate = useNavigate()
     const transition = useNavTransition(navigate)
 
+    const [modalTextInput, setModalTextInput] = useState(false)
+    const [modal, setModal] = useState(false)
     const [image, setImage] = useState('')
     const [loading, setLoading] = useState(false)
     const [names, setNames] = useState<string[]|null>([])
-    const [styles, setStyles] = useState<any[]>([])
+    const [styles, setStyles] = useState<any[]|null>([])
+    const imgRef = useRef()
 
     function onSelect(event: any) {
-        setLoading(true)
         let reader = new FileReader()
-        reader.readAsDataURL(event.target.files[0])
         reader.onload = (res: any) => {
-            AutoPOST(SERVER_DETECT_ANNOT, {img_uri: res.target.result}, (data: any) => {
-                // setImage(res.target.result)
-                setImage(data.img_uri)
-                setLoading(false)
-                // if (data.preds.length > 0) {
-                //     let nms = []
-                //     let stls = []
-                //     for (let i = 0; i < data.preds.length; i++) {
-                //         nms.push(data.preds[i].name)
-                //         stls.push({top: data.preds[i].box[1],
-                //                    left: data.preds[i].box[0],
-                //                    width: data.preds[i].box[2],
-                //                    height: data.preds[i].box[3],
-                //                    border: data.preds[i].name == "Unknown" ? "2px solid #ff0000" : "2px solid #00ff00"})
-                //     }
-                //     setNames(nms);
-                //     setStyles(stls);
-                //     if (loading) setLoading(false)
-                // } else {
-                //     setNames(null);
-                //     setLoading(false)
-                // }
-            }, (error) => {
-                transition('/error', {state: error, replace: true})
-            })
-
+            event.target.value = "";
+            setImage(res.target.result)
+            let img = new Image()
+            img.onload = () => {
+                AutoPOST(SERVER_DETECT, {img_uri: res.target.result}, (data: IDetectResponseData, status) => {
+                    setLoading(false)
+                    if (data.preds.length > 0) {
+                        let nms = []
+                        let stls = []
+                        for (let i = 0; i < data.preds.length; i++) {
+                            nms.push(data.preds[i].name)
+                            let x_scale = 1
+                            let y_scale = 1
+                            if (img.width > 1280 || img.height > 720) {
+                                x_scale = img.width / imgRef.current.width
+                                y_scale = img.height / imgRef.current.height
+                            }
+                            stls.push({top: data.preds[i].box[1] / y_scale,
+                                       left: data.preds[i].box[0] / x_scale,
+                                       width: data.preds[i].box[2] / x_scale,
+                                       height: data.preds[i].box[3] / y_scale
+                                    })
+                        }
+                        setNames(nms);
+                        setStyles(stls);
+                        if (loading) setLoading(false)
+                    } else {
+                        setNames(null);
+                        setLoading(false)
+                    }
+                }, (error) => {
+                    transition('/error', {state: error, replace: true})
+                })
+            }
+            img.src = res.target.result
+        }
+        if (event.target.files[0]) {
+            setLoading(true)
+            setNames(null)
+            setStyles(null)
+            reader.readAsDataURL(event.target.files[0])
         }
     }
 
+    function onAdd() {
+        setModalTextInput(true)
+    }
+
+    function onConfirm(text: string) {
+        setModalTextInput(false)
+        setLoading(true)
+        let token = sessionStorage.getItem('token')
+        AutoPOST(SERVER_USER_ADD,
+            {name: text.toUpperCase(), img_uri: image, token: token},
+            (data, status) => { setLoading(false); setModal(true) },
+            (error) => transition("/error", {state: error, replace: true})
+        )
+    }
+
     return (
-        <PageBody className='ImagePage'>
-            <>
-                <div className="image-submit-form">
-                    {loading && <Loading />}
-                    <span>
-                        <label className="file-input button button-selected prevent-select">
-                            Upload image
-                            <input type="file" accept="image/png, image/jpeg" onChange={onSelect} />
-                        </label>
-                    </span>
+        <>
+            {loading && <Loading />}
+            <div className='ImagePage'>
+                <div className="submit-section">
+                    <InputFile label="Upload image" accept="image/png, image/jpeg" onChange={onSelect} disabled={loading} width={150} height={50} />
                 </div>
                 <div className="image-container">
-                    <img src={image}></img>
                     <div className="image">
-                        {/* {names && Array.from(styles, (style: object, i) => {
-                            return <div key={i} className='image-overlay' style={style}></div>
+                        {(styles && names) && Array.from(names, (name: string, i) => {
+                            return (
+                                <div key={i} className={'image-overlay ' + ((name === 'Unknown') ? 'unknown' : 'known')} style={styles[i]}>
+                                    { (name === 'Unknown') &&
+                                        <div className="add-icon">
+                                            <InputButton label="Add" onClick={ onAdd }  width={50} height={50} />
+                                        </div> }
+                                    <p className="prevent-select" style={{top: styles[i].height + 1, left: -2, border: (name === 'Unknown')  ? "1px solid #ff0000" : "1px solid #00ff00"}}>{name}</p>
+                                </div>
+                            )
                         })}
-                        {names && Array.from(names, (name: string, i) => {
-                            return <p key={i} style={{top: styles[i].top+styles[i].height+2, left: styles[i].left}}>{name}</p>
-                        })} */}
+                        <img className="prevent-select" src={image} ref={imgRef} ></img>
                     </div>
                 </div>
-            </>
-        </PageBody>
+            </div>
+            { modalTextInput && <ModalTextInput title="Enter name" onConfirm={ onConfirm } onBack={ () => setModalTextInput(false) } /> }
+            { modal && <ModalNotify title="Successfully added. Load image again to see result" onOk={() => setModal(false)} /> }
+        </>
     )
 }

@@ -84,7 +84,7 @@ export default function Camera(props: {getImg?: Function, disabled?: boolean}) {
                     return <div key={i} className='webcam-overlay' style={style}></div>
                 })}
                 {names && Array.from(names, (name: string, i) => {
-                    return <p key={i} style={{top: styles[i].top+styles[i].height+2, left: styles[i].left}}>{name}</p>
+                    return <p key={i} style={{top: styles[i].top+styles[i].height+4, left: styles[i].left, border: (name === 'Unknown')  ? "1px solid #ff0000" : "1px solid #00ff00"}}>{name}</p>
                 })}
             </div>
         </>

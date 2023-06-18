@@ -6,7 +6,7 @@ import uuid
 from model import Model, FIND_PERSON_REF_PATH, FIND_ALL_REF_PATH, DEFAULT_REF_PATH
 from utils import (makeIMGfromURI, makeURIfromIMG, returnStatus, get_users_info,
                    get_user_info, delete_user, delete_user_img, add_user,
-                   saved_users, add_user_img)
+                   saved_users, add_user_img, saveVIDEOfromURI)
 
 
 token = str(uuid.uuid1())
@@ -83,36 +83,49 @@ def detect_annot():
         result_coor = (bbox[0] + 2, bbox[1] - 3)
         cv2.putText(org_img, display_msg, result_coor, cv2.FONT_HERSHEY_DUPLEX, 1, color)
     img_uri = makeURIfromIMG(org_img)
-    return returnStatus(data={'img_uri': img_uri})
+    height, width, _ = org_img.shape
+    return returnStatus(data={'img_uri': img_uri, 'width': width, 'height': height})
 
 
 @app.post("/find-person-start")
 def find_person_start():
     data = request.get_json(silent=True)
     try:
-        video_path = data['path']
+        video_uri = data['video']
     except KeyError:
-        return returnStatus(status="Bad request - key 'path' not provided", code=400)
+        return returnStatus(status="Bad request - key 'video' not provided", code=400)
     try:
         ref_imgs = data['imgs']
     except KeyError:
         return returnStatus(status="Bad request - key 'imgs' not provided", code=400)
 
     if len(ref_imgs) > 0:
-
         for r, ds, fs in os.walk(FIND_PERSON_REF_PATH):
             for f in fs:
                 os.remove(os.path.join(r, f))
-
+        imgs = []
         for i, img in enumerate(ref_imgs):
             img = makeIMGfromURI(img)
+            _, bboxes = model.detect(img)
+            if len(bboxes) > 1 or len(bboxes) == 0:
+                return returnStatus(status="Bad request - Invalid image provided", code=400)
+            face = img[bboxes[0][1]:bboxes[0][1] + bboxes[0][3], bboxes[0][0]:bboxes[0][0] + bboxes[0][2], :]
+            imgs.append(face)
+        for img in imgs:
             cv2.imwrite(os.path.join(FIND_PERSON_REF_PATH, f'{i}.jpg'), img)
 
-        model.face_recognition.load_embed(FIND_PERSON_REF_PATH)
+        model.change_ref(FIND_PERSON_REF_PATH)
     else:
-        model.face_recognition.load_embed(FIND_ALL_REF_PATH)
+        for r, ds, fs in os.walk(FIND_ALL_REF_PATH):
+            for f in fs:
+                os.remove(os.path.join(r, f))
+        model.change_ref(FIND_ALL_REF_PATH)
 
-    model.cap_init(video_path)
+    saveVIDEOfromURI(video_uri, 'temp.mp4')
+    del video_uri
+    del ref_imgs
+
+    model.cap_init('temp.mp4')
 
     return returnStatus(data='1')
 
@@ -122,7 +135,10 @@ def find_person_forward():
     if model.cap is None:
         return returnStatus(status="Bad request", code=400)
     percent, frame = model.cap_forward()
-    img_uri = makeURIfromIMG(frame)
+    if frame is not None:
+        img_uri = makeURIfromIMG(frame)
+    else:
+        img_uri = None
 
     return returnStatus(data={
         'percent': percent,
@@ -138,9 +154,9 @@ def find_person_stop():
     for ts, img in list(zip(model.cap_timestamp_buffer, model.cap_frame_buffer)):
         info.append({
             'timestamp': ts,
-            'image': img
+            'image': makeURIfromIMG(img)
         })
-    model.face_recognition.load_embed(DEFAULT_REF_PATH)
+    model.change_ref(DEFAULT_REF_PATH)
     model.cap_deinit()
     return returnStatus(data=info)
 
@@ -187,7 +203,7 @@ def user():
 def user_delete(id):
     if id:
         if delete_user(id):
-            model.refresh_face_dist()
+            model.change_ref(DEFAULT_REF_PATH)
             return returnStatus(status="ok", code=200)
         else:
             return returnStatus(status="Not found", code=404)
@@ -198,7 +214,7 @@ def user_delete(id):
 def user_delete_img(id, count):
     if id and count:
         if delete_user_img(id, count):
-            model.refresh_face_dist()
+            model.change_ref(DEFAULT_REF_PATH)
             return returnStatus(status="ok", code=200)
         else:
             return returnStatus(status="Not found", code=404)
@@ -230,7 +246,7 @@ def user_add_img():
     face = model.crop_face(img)
     if face is not None:
         add_user_img(id, name, face)
-        model.refresh_face_dist()
+        model.change_ref(DEFAULT_REF_PATH)
     else:
         return returnStatus(status="warn", code=200)
     return returnStatus(status="ok", code=200)
@@ -260,7 +276,7 @@ def user_add():
     face = model.crop_face(img)
     if face is not None:
         add_user(name, face)
-        model.refresh_face_dist()
+        model.change_ref(DEFAULT_REF_PATH)
     else:
         return returnStatus(status="warn", code=200)
     return returnStatus(status="ok", code=200)
