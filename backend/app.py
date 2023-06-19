@@ -111,7 +111,7 @@ def find_person_start():
                 return returnStatus(status="Bad request - Invalid image provided", code=400)
             face = img[bboxes[0][1]:bboxes[0][1] + bboxes[0][3], bboxes[0][0]:bboxes[0][0] + bboxes[0][2], :]
             imgs.append(face)
-        for img in imgs:
+        for i, img in enumerate(imgs):
             cv2.imwrite(os.path.join(FIND_PERSON_REF_PATH, f'{i}.jpg'), img)
 
         model.change_ref(FIND_PERSON_REF_PATH)
@@ -248,7 +248,7 @@ def user_add_img():
         add_user_img(id, name, face)
         model.change_ref(DEFAULT_REF_PATH)
     else:
-        return returnStatus(status="warn", code=200)
+        return returnStatus(status="Bad request - Invalid image URI", code=400)
     return returnStatus(status="ok", code=200)
 
 
@@ -278,7 +278,7 @@ def user_add():
         add_user(name, face)
         model.change_ref(DEFAULT_REF_PATH)
     else:
-        return returnStatus(status="warn", code=200)
+        return returnStatus(status="Bad request - Invalid image URI", code=400)
     return returnStatus(status="ok", code=200)
 
 

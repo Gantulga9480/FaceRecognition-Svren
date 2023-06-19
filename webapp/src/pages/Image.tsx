@@ -2,13 +2,17 @@ import { useState, useRef } from "react"
 import { useNavigate } from "react-router-dom"
 import Loading from "../components/Loading"
 import { InputButton, InputFile } from "../components/Input"
-import { ModalTextInput, ModalNotify } from "../components/Modal"
+import { ModalTextInput, ModalNotify, ModalConfirm } from "../components/Modal"
 import { useNavTransition } from "../utils/hooks"
-import { AutoPOST } from "../utils/requests"
-import { SERVER_DETECT, SERVER_USER_ADD } from "../api_endpoints"
+import { AutoPOST, AutoGET } from "../utils/requests"
+import { SERVER_DETECT, SERVER_USER_ADD, SERVER_USERS_INFO, SERVER_USER_ADD_IMG } from "../api_endpoints"
 import { IDetectResponseData } from "../api_endpoints.interface"
 import '../assets/styles/ImagePage.css'
 
+interface IUserInfo {
+    id: string
+    name: string
+}
 
 export default function ImagePage() {
 
@@ -17,10 +21,15 @@ export default function ImagePage() {
 
     const [modalTextInput, setModalTextInput] = useState(false)
     const [modal, setModal] = useState(false)
+    const [modalConfirm, setModalConfirm] = useState(false)
+    const [modalTitle, setModalTitle] = useState('')
+    const [name, setName] = useState('')
+    const [id, setId] = useState('')
     const [image, setImage] = useState('')
     const [loading, setLoading] = useState(false)
     const [names, setNames] = useState<string[]|null>([])
     const [styles, setStyles] = useState<any[]|null>([])
+    const [usersInfo, setUsersInfo] = useState<IUserInfo[]>([])
     const imgRef = useRef()
 
     function onSelect(event: any) {
@@ -71,16 +80,56 @@ export default function ImagePage() {
     }
 
     function onAdd() {
-        setModalTextInput(true)
+        setLoading(true)
+        let token = sessionStorage.getItem('token')
+        AutoGET(`${SERVER_USERS_INFO}?token=${token}`, (data: IUserInfo[], status: string) => {
+            if (status === 'ok') {
+                setUsersInfo(data)
+                setLoading(false)
+                setModalTextInput(true)
+            }
+            else transition('/error', {state: {status: 'Failed to load users', code: 500}, replace: true})
+        }, (error) => {
+            if (error.code === "401") transition('/login',)
+            else transition('/error', {state: error, replace: true})
+        })
     }
 
     function onConfirm(text: string) {
         setModalTextInput(false)
         setLoading(true)
+        setName(text)
+        for (let i = 0; i < usersInfo.length; i++) {
+            if (text.toUpperCase() === usersInfo[i].name) {
+                setId(usersInfo[i].id)
+                setModalTitle(`User ${text} aleady exists. Add new image to ${text}?`)
+                setModalConfirm(true)
+                return
+            }
+        }
         let token = sessionStorage.getItem('token')
         AutoPOST(SERVER_USER_ADD,
             {name: text.toUpperCase(), img_uri: image, token: token},
             (data, status) => { setLoading(false); setModal(true) },
+            (error) => {
+                if (error.code === "401") transition('/login',)
+                else transition('/error', {state: error, replace: true})
+            }
+        )
+    }
+
+    function onNameConfirm() {
+        setModalConfirm(false)
+        let token = sessionStorage.getItem('token')
+        AutoPOST(SERVER_USER_ADD_IMG, {
+            token: token,
+            id: id,
+            name: name,
+            img_uri: image},
+            (data, status) => {
+                setLoading(false)
+                setModal(true)
+            },
             (error) => transition("/error", {state: error, replace: true})
         )
     }
@@ -111,6 +160,7 @@ export default function ImagePage() {
             </div>
             { modalTextInput && <ModalTextInput title="Enter name" onConfirm={ onConfirm } onBack={ () => setModalTextInput(false) } /> }
             { modal && <ModalNotify title="Successfully added. Load image again to see result" onOk={() => setModal(false)} /> }
+            { modalConfirm && <ModalConfirm title={modalTitle} onYes={onNameConfirm} onNo={() => {setModalConfirm(false); setLoading(false)}} /> }
         </>
     )
 }

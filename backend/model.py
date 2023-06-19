@@ -44,7 +44,7 @@ class Model:
     def crop_face(self, img):
         bboxes, re_confidence, re_mask_id = self.face_detect.detect(img)
         face = None
-        if len(bboxes) > 0:
+        if len(bboxes) == 1:
             for i, bbox in enumerate(bboxes):
                 face = img[bbox[1]:bbox[1] + bbox[3], bbox[0]:bbox[0] + bbox[2], :]
                 break
