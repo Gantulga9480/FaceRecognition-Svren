@@ -37,7 +37,7 @@ export default function CreateUser() {
         AutoPOST(SERVER_USER_ADD_IMG, {
             token: token,
             id: id,
-            name: name,
+            name: name.toUpperCase(),
             img_uri: image},
             (data, status) => {
                 setTimeout(() => {
