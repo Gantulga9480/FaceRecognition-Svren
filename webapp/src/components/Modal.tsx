@@ -39,10 +39,10 @@ export function ModalConfirm(props: IModalProps) {
                 </div>
                 <div className="modal-btn">
                     <span>
-                        <Button text="Yes" onClick={yesCallback} seleced />
+                        <Button text="Тийм" onClick={yesCallback} seleced />
                     </span>
                     <span>
-                        <Button text="No" onClick={noCallback} seleced />
+                        <Button text="Үгүй" onClick={noCallback} seleced />
                     </span>
                 </div>
             </div>
@@ -60,7 +60,7 @@ export function ModalNotify(props: IModalNotifyProps) {
                 </div>
                 <div className="modal-btn">
                     <span>
-                        <Button text="OK" onClick={() => props.onOk()} seleced />
+                        <Button text="Хаах" onClick={() => props.onOk()} seleced />
                     </span>
                 </div>
             </div>
@@ -95,10 +95,10 @@ export function ModalTextInput(props: IModalTextInputProps) {
                 <div style={{height: "20px", width: "100%"}}></div>
                 <div className="modal-btn">
                     <span style={{width: "100px"}}>
-                        <Button text="Confirm" onClick={yesCallback} seleced />
+                        <Button text="Хадгалах" onClick={yesCallback} seleced />
                     </span>
                     <span style={{width: "100px"}}>
-                        <Button text="Back" onClick={noCallback} seleced />
+                        <Button text="Буцах" onClick={noCallback} seleced />
                     </span>
                 </div>
             </div>

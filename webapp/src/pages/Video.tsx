@@ -86,7 +86,7 @@ export default function Video() {
         transition('/error', { state: error, replace: true })
       })
     } else {
-      setModalText('No video provided')
+      setModalText('Видео сонгоно уу')
       setModalState(true)
     }
   }
@@ -105,7 +105,7 @@ export default function Video() {
             if (data.length > 0) {
               setResList(data)
             } else {
-              setModalText('Found nothing from this video')
+              setModalText('Видеоноос хэрэглэгч олдсогнүй')
               setModalState(true)
             }
           }, (error) => {
@@ -128,11 +128,11 @@ export default function Video() {
         {loading && <Loading />}
         {percent && <span style={{ position: 'absolute', top: "33px", left: "30px" }}>{percent}%</span>}
         <div className="submit-section">
-          <InputFile label="Select video" onChange={onVideoInput} accept="video/mp4" disabled={loading} width={150} height={50} />
+          <InputFile label="Бичлэг оруулах" onChange={onVideoInput} accept="video/mp4" disabled={loading} width={150} height={50} />
           <span style={{ marginRight: "20px" }}></span>
-          <InputFile label="Select image" onChange={onImageInput} accept="image/png,image/jpeg" multiple disabled={loading} width={150} height={50} />
+          <InputFile label="Зураг оруулах" onChange={onImageInput} accept="image/png,image/jpeg" multiple disabled={loading} width={150} height={50} />
           <span style={{ marginRight: "20px" }}></span>
-          <InputButton label="Process" onClick={process} disabled={loading} width={150} height={50} />
+          <InputButton label="Боловсруулах" onClick={process} disabled={loading} width={150} height={50} />
         </div>
         {image &&
           <div className="image-container">
@@ -152,8 +152,8 @@ export default function Video() {
         </div>
       </div>
       {modalState && <ModalNotify title={modalText} onOk={() => { setModalState(false) }} />}
-      <SimplePopup message="Video selected" disable={videoPopup} />
-      <SimplePopup message="Image selected" disable={imagePopup} />
+      <SimplePopup message="Видео амжилттай сонгодлоо" disable={videoPopup} />
+      <SimplePopup message="Зураг амжилттай сонгодлоо" disable={imagePopup} />
     </>
   );
 }

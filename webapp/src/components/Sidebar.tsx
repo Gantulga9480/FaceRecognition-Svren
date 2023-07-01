@@ -10,7 +10,7 @@ import camereIcon from '../assets/icons/Camera.svg'
 import folderIcon from '../assets/icons/Folder.svg'
 import '../assets/styles/sidebar.css'
 
-const navName = ['Camera', 'Video', 'Image','Adminstration', 'About us']
+const navName = ['Камер', 'Видео', 'Зураг','Админ', 'Бидний тухай']
 const navPath = ['/', '/video', '/image','/admin', '/about']
 const navIcon = [camereIcon, videoIcon, folderIcon, adminIcon, aboutIcon]
 

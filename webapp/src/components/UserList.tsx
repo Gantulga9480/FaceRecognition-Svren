@@ -117,7 +117,7 @@ export default function UserList() {
         <>
             {loading && <Loading />}
             <div className="users">
-                {showmodal && <ModalConfirm title={`Are you sure you want to delete ${currentIdName.name}?`}
+                {showmodal && <ModalConfirm title={`Та ${currentIdName.name} нэртэй хэрэглэгчийг устгамаар байна уу?`}
                                             onNo={() => setShowModal(false)}
                                             onYes={modalYesCallback} />}
                 <div className="users-list">

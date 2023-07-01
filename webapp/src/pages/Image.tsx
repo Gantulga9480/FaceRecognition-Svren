@@ -90,7 +90,7 @@ export default function ImagePage() {
             }
             else transition('/error', {state: {status: 'Failed to load users', code: 500}, replace: true})
         }, (error) => {
-            if (error.code === "401") transition('/login',)
+            if (error.code === "401") transition('/login', {state: {path: '/image'}, replace: true})
             else transition('/error', {state: error, replace: true})
         })
     }
@@ -102,7 +102,7 @@ export default function ImagePage() {
         for (let i = 0; i < usersInfo.length; i++) {
             if (text.toUpperCase() === usersInfo[i].name) {
                 setId(usersInfo[i].id)
-                setModalTitle(`User ${text} aleady exists. Add new image to ${text}?`)
+                setModalTitle(`${text.toUpperCase()} нэртэй хэрэглэгч бүртгэлтэй байна. Энэхүү зургийг бүртгэлтэй байгаа хэрэглэгч дээр нэмэх үү?`)
                 setModalConfirm(true)
                 return
             }
@@ -112,7 +112,7 @@ export default function ImagePage() {
             {name: text.toUpperCase(), img_uri: image, token: token},
             (data, status) => { setLoading(false); setModal(true) },
             (error) => {
-                if (error.code === "401") transition('/login',)
+                if (error.code === "401") transition('/login', {state: {path: '/image'}, replace: true})
                 else transition('/error', {state: error, replace: true})
             }
         )
@@ -139,7 +139,7 @@ export default function ImagePage() {
             {loading && <Loading />}
             <div className='ImagePage'>
                 <div className="submit-section">
-                    <InputFile label="Upload image" accept="image/png, image/jpeg" onChange={onSelect} disabled={loading} width={150} height={50} />
+                    <InputFile label="Зураг оруулах" accept="image/png, image/jpeg" onChange={onSelect} disabled={loading} width={150} height={50} />
                 </div>
                 <div className="image-container">
                     <div className="image">
@@ -158,8 +158,8 @@ export default function ImagePage() {
                     </div>
                 </div>
             </div>
-            { modalTextInput && <ModalTextInput title="Enter name" onConfirm={ onConfirm } onBack={ () => setModalTextInput(false) } /> }
-            { modal && <ModalNotify title="Successfully added. Load image again to see result" onOk={() => setModal(false)} /> }
+            { modalTextInput && <ModalTextInput title="Хэрэглэгчийн нэр" onConfirm={ onConfirm } onBack={ () => setModalTextInput(false) } /> }
+            { modal && <ModalNotify title="Амжилттай хадгалагдлаа. Зургийг дахин оруулж үр дүнг харна уу." onOk={() => setModal(false)} /> }
             { modalConfirm && <ModalConfirm title={modalTitle} onYes={onNameConfirm} onNo={() => {setModalConfirm(false); setLoading(false)}} /> }
         </>
     )

@@ -1,5 +1,5 @@
 import { SyntheticEvent, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useNavTransition } from "../utils/hooks";
 import { AutoPOST } from "../utils/requests";
 import { SERVER_ADMIN_LOGIN } from "../api_endpoints";
@@ -7,7 +7,7 @@ import '../assets/styles/Login.css'
 
 
 export default function Login() {
-
+    const location = useLocation()
     const navigate = useNavigate()
     const transition = useNavTransition(navigate)
     const [name, setName] = useState('')
@@ -24,7 +24,11 @@ export default function Login() {
         AutoPOST(SERVER_ADMIN_LOGIN, data, (data: {token: string}, status: string) => {
             if (status === 'ok') {
                 sessionStorage.setItem('token', data.token)
-                transition('/admin')
+                if (location.state.path) {
+                    transition(location.state.path)
+                } else {
+                    transition('/admin')
+                }
             }
             else setfieldClass("form-wrong form-field")
         }, (error) => {
@@ -37,21 +41,21 @@ export default function Login() {
 
     return (
         <div className="Login">
-            <div className="Login-header">Log into admin dashboard</div>
+            <div className="Login-header">Админ самбарт нэвтрэх</div>
             <form onSubmit={handleSubmit}>
                 <div>
-                <input className={fieldClass} type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="User Name" required />
+                <input className={fieldClass} type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Админ нэр" required />
                 </div>
                 <div>
-                <input className={fieldClass} type="password" value={pass} onChange={(e) => setPass(e.target.value)} placeholder="Password" required />
+                <input className={fieldClass} type="password" value={pass} onChange={(e) => setPass(e.target.value)} placeholder="Нууц үг" required />
                 </div>
                 <div>
-                <input className="form-button" type="submit" value="Log in"/>
+                <input className="form-button" type="submit" value="Нэвтрэх"/>
                 </div>
             </form>
             {error &&
                 <div className="login-error">
-                    Wrong name or password
+                    Алдаатай нэр эсвэл нууц үг
             </div>}
         </div>
     );

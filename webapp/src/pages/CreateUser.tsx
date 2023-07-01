@@ -116,15 +116,15 @@ export default function CreateUser() {
         <>
             {loading && <Loading />}
             <div className="Create">
-                {showmodal && <ModalConfirm title={`User ${name} aleady exists. Add new image to ${name}?`}
+                {showmodal && <ModalConfirm title={`${name.toUpperCase()} нэртэй хэрэглэгч бүртгэлтэй байна. Энэхүү зургийг бүртгэлтэй байгаа хэрэглэгч дээр нэмэх үү?`}
                                             onNo={modalNoCallback}
                                             onYes={modalYesCallback} />}
                 <Camera getImg={setImage} disabled={camDisabled}/>
                 <div className="Create-name">
-                    <input type="text" value={name} placeholder="Enter user name" onChange={(e) => { setName(e.target.value); setNameError(false) }} required />
+                    <input type="text" value={name} placeholder="Нэр оруулах" onChange={(e) => { setName(e.target.value); setNameError(false) }} required />
                     {nameError && <p style={{color: "red"}}>Please provide user name</p>}
                 </div>
-                <span><Button id={0} text="Submit" onClick={onSubmit} seleced disabled={btnDisabled}/></span>
+                <span><Button id={0} text="Оруулах" onClick={onSubmit} seleced disabled={btnDisabled}/></span>
             </div>
         </>
     )

@@ -39,9 +39,9 @@ export default function Admin() {
     ) : (
         <>
             <div className="Admin-top">
-                <span><Button text="Add person" onClick={addPersonCallback} seleced /></span>
+                <span><Button text="Хэрэглэгч нэмэх" onClick={addPersonCallback} seleced /></span>
                 <span style={{width: "30px"}}></span>
-                <span><Button text="Log out" onClick={logoutCallback} seleced /></span>
+                <span><Button text="Гарах" onClick={logoutCallback} seleced /></span>
             </div>
             <UserList />
         </>

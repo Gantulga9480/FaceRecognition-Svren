@@ -248,7 +248,7 @@ def user_add_img():
         add_user_img(id, name, face)
         model.change_ref(DEFAULT_REF_PATH)
     else:
-        return returnStatus(status="Bad request - Invalid image URI", code=400)
+        return returnStatus(status="Please provide image with only one person", code=400)
     return returnStatus(status="ok", code=200)
 
 
@@ -278,7 +278,7 @@ def user_add():
         add_user(name, face)
         model.change_ref(DEFAULT_REF_PATH)
     else:
-        return returnStatus(status="Bad request - Invalid image URI", code=400)
+        return returnStatus(status="Please provide image with only one person", code=400)
     return returnStatus(status="ok", code=200)
 
 
