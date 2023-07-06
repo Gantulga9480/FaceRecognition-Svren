@@ -1,4 +1,4 @@
-import { useState, useRef } from "react"
+import React, { useState, useRef } from "react"
 import { useNavigate } from "react-router-dom"
 import Loading from "../components/Loading"
 import { InputButton, InputFile } from "../components/Input"
@@ -30,7 +30,7 @@ export default function ImagePage() {
     const [names, setNames] = useState<string[]|null>([])
     const [styles, setStyles] = useState<any[]|null>([])
     const [usersInfo, setUsersInfo] = useState<IUserInfo[]>([])
-    const imgRef = useRef()
+    const imgRef = useRef<HTMLImageElement>(null)
 
     function onSelect(event: any) {
         let reader = new FileReader()
@@ -49,8 +49,11 @@ export default function ImagePage() {
                             let x_scale = 1
                             let y_scale = 1
                             if (img.width > 1280 || img.height > 720) {
-                                x_scale = img.width / imgRef.current.width
-                                y_scale = img.height / imgRef.current.height
+                                if (imgRef.current)
+                                {
+                                    x_scale = img.width / imgRef.current.width
+                                    y_scale = img.height / imgRef.current.height
+                                }
                             }
                             stls.push({top: data.preds[i].box[1] / y_scale,
                                        left: data.preds[i].box[0] / x_scale,
@@ -150,7 +153,7 @@ export default function ImagePage() {
                                         <div className="add-icon">
                                             <InputButton label="Add" onClick={ onAdd }  width={50} height={50} />
                                         </div> }
-                                    <p className="prevent-select" style={{top: styles[i].height + 1, left: -2, border: (name === 'Unknown')  ? "1px solid #ff0000" : "1px solid #00ff00"}}>{name}</p>
+                                    <p className="prevent-select" style={{top: styles[i].height + 1, left: -2, border: (name === 'Unknown')  ? "1px solid #ff0000" : "1px solid #00ff00"}}>{name.toUpperCase()}</p>
                                 </div>
                             )
                         })}

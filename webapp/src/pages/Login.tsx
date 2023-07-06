@@ -24,8 +24,9 @@ export default function Login() {
         AutoPOST(SERVER_ADMIN_LOGIN, data, (data: {token: string}, status: string) => {
             if (status === 'ok') {
                 sessionStorage.setItem('token', data.token)
-                if (location.state.path) {
-                    transition(location.state.path)
+                if (location.state) {
+                    if (location.state.path) transition(location.state.path)
+                    else transition('/admin')
                 } else {
                     transition('/admin')
                 }

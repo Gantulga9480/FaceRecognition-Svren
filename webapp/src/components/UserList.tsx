@@ -47,7 +47,7 @@ export function User(props: IUserProp) {
     return (
         <div className="user">
             <div className="user-detail">
-                <div style={{marginRight: '20px'}}>{props.btnid+1}.</div>
+                <div style={{marginRight: '20px', width: '20px'}}>{props.btnid+1}.</div>
                 <div className="user-name">{props.user.name}</div>
                 <div className="user-id">{props.user.id}</div>
                 {Array.from(props.user.image_info.images, (e: string, i) => {
